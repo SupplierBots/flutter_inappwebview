@@ -10,15 +10,15 @@ import WebKit
 
 public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
     var webView: InAppWebView?
-    
+
     init(webView: InAppWebView) {
         super.init()
         self.webView = webView
     }
-    
+
     public override func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let arguments = call.arguments as? NSDictionary
-        
+
         switch call.method {
             case "getUrl":
                 result(webView?.url?.absoluteString)
@@ -57,7 +57,7 @@ public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                 break
             case "loadFile":
                 let assetFilePath = arguments!["assetFilePath"] as! String
-                
+
                 do {
                     try webView?.loadFile(assetFilePath: assetFilePath)
                 }
@@ -487,7 +487,7 @@ public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                 if let webView = webView {
                     let message = arguments!["message"] as! [String: Any?]
                     let targetOrigin = arguments!["targetOrigin"] as! String
-                    
+
                     var ports: [WebMessagePort] = []
                     let portsMap = message["ports"] as? [[String: Any?]]
                     if let portsMap = portsMap {
@@ -539,12 +539,103 @@ public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                     result(false)
                 }
                 break
+
+            case "setCookie":
+                let url = arguments!["url"] as! String
+                let name = arguments!["name"] as! String
+                let value = arguments!["value"] as! String
+                let domain = arguments!["domain"] as! String
+                let path = arguments!["path"] as! String
+
+                var expiresDate: Int64?
+                if let expiresDateString = arguments!["expiresDate"] as? String {
+                    expiresDate = Int64(expiresDateString)
+                }
+
+                let maxAge = arguments!["maxAge"] as? Int64
+                let isSecure = arguments!["isSecure"] as? Bool
+                let isHttpOnly = arguments!["isHttpOnly"] as? Bool
+                let sameSite = arguments!["sameSite"] as? String
+
+
+                if let webView = webView, #available(iOS 11.0, *) {
+                    webView.setCookie(url: url,
+                                              name: name,
+                                              value: value,
+                                              domain: domain,
+                                              path: path,
+                                              expiresDate: expiresDate,
+                                              maxAge: maxAge,
+                                              isSecure: isSecure,
+                                              isHttpOnly: isHttpOnly,
+                                              sameSite: sameSite,
+                                              result: result)
+                }
+                else {
+                    result(nil)
+                }
+
+                break
+            case "getCookies":
+                let url = arguments!["url"] as! String
+
+                if let webView = webView, #available(iOS 11.0, *) {
+                    webView.getCookies(url: url, result: result)
+
+                }
+                else {
+                    result(nil)
+                }
+
+                break
+            case "getAllCookies":
+                if let webView = webView, #available(iOS 11.0, *) {
+                    webView.getAllCookies(result: result)
+                }
+                else {
+                    result(nil)
+                }
+                break
+            case "deleteCookie":
+                let url = arguments!["url"] as! String
+                let name = arguments!["name"] as! String
+                let domain = arguments!["domain"] as! String
+                let path = arguments!["path"] as! String
+
+                if let webView = webView, #available(iOS 11.0, *) {
+                    webView.deleteCookie(url: url, name: name, domain: domain, path: path, result: result)
+                }
+                else {
+                    result(nil)
+                }
+
+                break;
+            case "deleteCookies":
+                let url = arguments!["url"] as! String
+                let domain = arguments!["domain"] as! String
+                let path = arguments!["path"] as! String
+
+                if let webView = webView, #available(iOS 11.0, *) {
+                    webView.deleteCookies(url: url, domain: domain, path: path, result: result)
+                }
+                else {
+                    result(nil)
+                }
+                break;
+            case "deleteAllCookies":
+                if let webView = webView, #available(iOS 11.0, *) {
+                    webView.deleteAllCookies(result: result)
+                }
+                else {
+                    result(nil)
+                }
+                break
             default:
                 result(FlutterMethodNotImplemented)
                 break
         }
     }
-    
+
     deinit {
         print("InAppWebViewMethodHandler - dealloc")
         webView = nil
