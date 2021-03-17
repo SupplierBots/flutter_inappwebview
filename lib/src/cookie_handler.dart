@@ -412,7 +412,7 @@ class IOSCookieHandler {
   IOSCookieHandler({
     required MethodChannel channel,
   }) {
-    this._channel = _channel;
+    this._channel = channel;
   }
 
   late MethodChannel _channel;
