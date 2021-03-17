@@ -410,9 +410,12 @@ class CookieHandler {
 ///Class that contains only iOS-specific methods of [CookieHandler].
 class IOSCookieHandler {
   IOSCookieHandler({
-    required this.channel,
-  });
-  final MethodChannel channel;
+    required MethodChannel channel,
+  }) {
+    this._channel = _channel;
+  }
+
+  late MethodChannel _channel;
 
   ///Fetches all stored cookies.
   ///
@@ -424,7 +427,7 @@ class IOSCookieHandler {
 
     Map<String, dynamic> args = <String, dynamic>{};
     List<dynamic> cookieListMap =
-        await channel.invokeMethod('getAllCookies', args);
+        await _channel.invokeMethod('getAllCookies', args);
     cookieListMap = cookieListMap.cast<Map<dynamic, dynamic>>();
 
     cookieListMap.forEach((cookieMap) {

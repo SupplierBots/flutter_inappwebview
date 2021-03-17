@@ -1458,7 +1458,8 @@ class InAppWebViewController {
   void addJavaScriptHandler(
       {required String handlerName,
       required JavaScriptHandlerCallback callback}) {
-    assert(!_JAVASCRIPT_HANDLER_FORBIDDEN_NAMES.contains(handlerName), '"$handlerName" is a forbidden name!');
+    assert(!_JAVASCRIPT_HANDLER_FORBIDDEN_NAMES.contains(handlerName),
+        '"$handlerName" is a forbidden name!');
     this.javaScriptHandlersMap[handlerName] = (callback);
   }
 
@@ -1797,13 +1798,13 @@ class InAppWebViewController {
   var metaTagNodes = document.head.getElementsByTagName('meta');
   for (var i = 0; i < metaTagNodes.length; i++) {
     var metaTagNode = metaTagNodes[i];
-    
+
     var otherAttributes = metaTagNode.getAttributeNames();
     var nameIndex = otherAttributes.indexOf("name");
     if (nameIndex !== -1) otherAttributes.splice(nameIndex, 1);
     var contentIndex = otherAttributes.indexOf("content");
     if (contentIndex !== -1) otherAttributes.splice(contentIndex, 1);
-    
+
     var attrs = [];
     for (var j = 0; j < otherAttributes.length; j++) {
       var otherAttribute = otherAttributes[j];
@@ -2092,12 +2093,14 @@ class InAppWebViewController {
 
   Future<WebMessageChannel?> createWebMessageChannel() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    Map<String, dynamic>? result = (await _channel.invokeMethod('createWebMessageChannel', args))
-        ?.cast<String, dynamic>();
+    Map<String, dynamic>? result =
+        (await _channel.invokeMethod('createWebMessageChannel', args))
+            ?.cast<String, dynamic>();
     return WebMessageChannel.fromMap(result);
   }
 
-  Future<void> postWebMessage({required WebMessage message, Uri? targetOrigin}) async {
+  Future<void> postWebMessage(
+      {required WebMessage message, Uri? targetOrigin}) async {
     if (targetOrigin == null) {
       targetOrigin = Uri.parse("");
     }
@@ -2107,8 +2110,11 @@ class InAppWebViewController {
     await _channel.invokeMethod('postWebMessage', args);
   }
 
-  Future<void> addWebMessageListener(WebMessageListener webMessageListener) async {
-    assert(!_webMessageListenerObjNames.contains(webMessageListener.jsObjectName), "jsObjectName ${webMessageListener.jsObjectName} was already added.");
+  Future<void> addWebMessageListener(
+      WebMessageListener webMessageListener) async {
+    assert(
+        !_webMessageListenerObjNames.contains(webMessageListener.jsObjectName),
+        "jsObjectName ${webMessageListener.jsObjectName} was already added.");
     _webMessageListenerObjNames.add(webMessageListener.jsObjectName);
 
     Map<String, dynamic> args = <String, dynamic>{};

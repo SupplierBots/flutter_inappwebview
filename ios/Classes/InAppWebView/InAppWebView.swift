@@ -17,6 +17,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     var channel: FlutterMethodChannel?
     var options: InAppWebViewOptions?
     var pullToRefreshControl: PullToRefreshControl?
+    
     var webMessageChannels: [String:WebMessageChannel] = [:]
     var webMessageListeners: [WebMessageListener] = []
     
@@ -47,7 +48,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     var onCreateContextMenuEventTriggeredWhenMenuDisabled = false
     
     var customIMPs: [IMP] = []
-    
+        
     static var windowWebViews: [Int64:WebViewTransport] = [:]
     static var windowAutoincrementId: Int64 = 0;
     
@@ -1123,7 +1124,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if #available(iOS 9.0, *) {
             //let websiteDataTypes = NSSet(array: [WKWebsiteDataTypeDiskCache, WKWebsiteDataTypeMemoryCache])
             let date = NSDate(timeIntervalSince1970: 0)
-            WKWebsiteDataStore.default().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), modifiedSince: date as Date, completionHandler:{ })
+            configuration.websiteDataStore.removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), modifiedSince: date as Date, completionHandler:{ })
         } else {
             var libraryPath = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.libraryDirectory, FileManager.SearchPathDomainMask.userDomainMask, false).first!
             libraryPath += "/Cookies"
@@ -2871,197 +2872,6 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         SharedLastTouchPointTimestamp.removeValue(forKey: self)
         callAsyncJavaScriptBelowIOS14Results.removeAll()
         super.removeFromSuperview()
-    }
-    
-    
-    @available(iOS 11.0, *)
-    public func setCookie(url: String,
-                          name: String,
-                          value: String,
-                          domain: String,
-                          path: String,
-                          expiresDate: Int64?,
-                          maxAge: Int64?,
-                          isSecure: Bool?,
-                          isHttpOnly: Bool?,
-                          sameSite: String?,
-                          result: @escaping FlutterResult) {
-        var properties: [HTTPCookiePropertyKey: Any] = [:]
-        properties[.originURL] = url
-        properties[.name] = name
-        properties[.value] = value
-        properties[.domain] = domain
-        properties[.path] = path
-        if expiresDate != nil {
-            // convert from milliseconds
-            properties[.expires] = Date(timeIntervalSince1970: TimeInterval(Double(expiresDate!)/1000))
-        }
-        if maxAge != nil {
-            properties[.maximumAge] = String(maxAge!)
-        }
-        if isSecure != nil && isSecure! {
-            properties[.secure] = "TRUE"
-        }
-        if isHttpOnly != nil && isHttpOnly! {
-            properties[.init("HttpOnly")] = "YES"
-        }
-        if sameSite != nil {
-            if #available(iOS 13.0, *) {
-                var sameSiteValue = HTTPCookieStringPolicy(rawValue: "None")
-                switch sameSite {
-                case "Lax":
-                    sameSiteValue = HTTPCookieStringPolicy.sameSiteLax
-                case "Strict":
-                    sameSiteValue = HTTPCookieStringPolicy.sameSiteStrict
-                default:
-                    break
-                }
-                properties[.sameSitePolicy] = sameSiteValue
-            } else {
-                properties[.init("SameSite")] = sameSite
-            }
-        }
-        
-        let cookie = HTTPCookie(properties: properties)!
-        
-        configuration.websiteDataStore.httpCookieStore.setCookie(cookie, completionHandler: {() in
-            result(true)
-        })
-    }
-    
-    @available(iOS 11.0, *)
-    public func getCookies(url: String, result: @escaping FlutterResult) {
-        var cookieList: [[String: Any?]] = []
-        
-        if let urlHost = URL(string: url)?.host {
-            configuration.websiteDataStore.httpCookieStore.getAllCookies { (cookies) in
-                for cookie in cookies {
-                    if urlHost.hasSuffix(cookie.domain) || ".\(urlHost)".hasSuffix(cookie.domain) {
-                        var sameSite: String? = nil
-                        if #available(iOS 13.0, *) {
-                            if let sameSiteValue = cookie.sameSitePolicy?.rawValue {
-                                sameSite = sameSiteValue.prefix(1).capitalized + sameSiteValue.dropFirst()
-                            }
-                        }
-                        
-                        var expiresDateTimestamp: Int64 = -1
-                        if let expiresDate = cookie.expiresDate?.timeIntervalSince1970 {
-                            // convert to milliseconds
-                            expiresDateTimestamp = Int64(expiresDate * 1000)
-                        }
-                        
-                        cookieList.append([
-                            "name": cookie.name,
-                            "value": cookie.value,
-                            "expiresDate": expiresDateTimestamp != -1 ? expiresDateTimestamp : nil,
-                            "isSessionOnly": cookie.isSessionOnly,
-                            "domain": cookie.domain,
-                            "sameSite": sameSite,
-                            "isSecure": cookie.isSecure,
-                            "isHttpOnly": cookie.isHTTPOnly,
-                            "path": cookie.path,
-                        ])
-                    }
-                }
-                result(cookieList)
-            }
-            return
-        } else {
-            print("Cannot get WebView cookies. No HOST found for URL: \(url)")
-        }
-        
-        result(cookieList)
-    }
-    
-    @available(iOS 11.0, *)
-    public func getAllCookies(result: @escaping FlutterResult) {
-        var cookieList: [[String: Any?]] = []
-        
-        configuration.websiteDataStore.httpCookieStore.getAllCookies { (cookies) in
-            for cookie in cookies {
-                var sameSite: String? = nil
-                if #available(iOS 13.0, *) {
-                    if let sameSiteValue = cookie.sameSitePolicy?.rawValue {
-                        sameSite = sameSiteValue.prefix(1).capitalized + sameSiteValue.dropFirst()
-                    }
-                }
-                
-                var expiresDateTimestamp: Int64 = -1
-                if let expiresDate = cookie.expiresDate?.timeIntervalSince1970 {
-                    // convert to milliseconds
-                    expiresDateTimestamp = Int64(expiresDate * 1000)
-                }
-                
-                cookieList.append([
-                    "name": cookie.name,
-                    "value": cookie.value,
-                    "expiresDate": expiresDateTimestamp != -1 ? expiresDateTimestamp : nil,
-                    "isSessionOnly": cookie.isSessionOnly,
-                    "domain": cookie.domain,
-                    "sameSite": sameSite,
-                    "isSecure": cookie.isSecure,
-                    "isHttpOnly": cookie.isHTTPOnly,
-                    "path": cookie.path,
-                ])
-            }
-            result(cookieList)
-        }
-    }
-    
-    @available(iOS 11.0, *)
-    public func deleteCookie(url: String, name: String, domain: String, path: String, result: @escaping FlutterResult) {
-        configuration.websiteDataStore.httpCookieStore.getAllCookies { (cookies) in
-            for cookie in cookies {
-                var originURL = ""
-                if cookie.properties![.originURL] is String {
-                    originURL = cookie.properties![.originURL] as! String
-                }
-                else if cookie.properties![.originURL] is URL {
-                    originURL = (cookie.properties![.originURL] as! URL).absoluteString
-                }
-                if (!originURL.isEmpty && originURL != url) {
-                    continue
-                }
-                if (cookie.domain == domain || cookie.domain == ".\(domain)" || ".\(cookie.domain)" == domain) && cookie.name == name && cookie.path == path {
-                    self.configuration.websiteDataStore.httpCookieStore.delete(cookie, completionHandler: {
-                        result(true)
-                    })
-                    return
-                }
-            }
-            result(false)
-        }
-    }
-    
-    @available(iOS 11.0, *)
-    public func deleteCookies(url: String, domain: String, path: String, result: @escaping FlutterResult) {
-        configuration.websiteDataStore.httpCookieStore.getAllCookies { (cookies) in
-            for cookie in cookies {
-                var originURL = ""
-                if cookie.properties![.originURL] is String {
-                    originURL = cookie.properties![.originURL] as! String
-                }
-                else if cookie.properties![.originURL] is URL{
-                    originURL = (cookie.properties![.originURL] as! URL).absoluteString
-                }
-                if (!originURL.isEmpty && originURL != url) {
-                    continue
-                }
-                if (cookie.domain == domain || cookie.domain == ".\(domain)" || ".\(cookie.domain)" == domain) && cookie.path == path {
-                    self.configuration.websiteDataStore.httpCookieStore.delete(cookie, completionHandler: nil)
-                }
-            }
-            result(true)
-        }
-    }
-    
-    @available(iOS 11.0, *)
-    public func deleteAllCookies(result: @escaping FlutterResult) {
-        let websiteDataTypes = NSSet(array: [WKWebsiteDataTypeCookies])
-        let date = NSDate(timeIntervalSince1970: 0)
-        configuration.websiteDataStore.removeData(ofTypes: websiteDataTypes as! Set<String>, modifiedSince: date as Date, completionHandler:{
-            result(true)
-        })
     }
     
     deinit {

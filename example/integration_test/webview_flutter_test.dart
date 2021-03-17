@@ -4395,15 +4395,14 @@ setTimeout(function() {
       expect(await InAppWebViewController.getDefaultUserAgent(), isNotNull);
     });
 
-    testWidgets('launches with pull-to-refresh feature', (WidgetTester tester) async {
+    testWidgets('launches with pull-to-refresh feature',
+        (WidgetTester tester) async {
       final Completer controllerCompleter = Completer<InAppWebViewController>();
       final pullToRefreshController = PullToRefreshController(
         options: PullToRefreshOptions(
           color: Colors.blue,
         ),
-        onRefresh: () {
-
-        },
+        onRefresh: () {},
       );
 
       await tester.pumpWidget(
@@ -4411,12 +4410,11 @@ setTimeout(function() {
           textDirection: TextDirection.ltr,
           child: InAppWebView(
             key: GlobalKey(),
-            initialUrlRequest: URLRequest(url: Uri.parse('https://github.com/flutter')),
+            initialUrlRequest:
+                URLRequest(url: Uri.parse('https://github.com/flutter')),
             initialOptions: InAppWebViewGroupOptions(
-              android: AndroidInAppWebViewOptions(
-                useHybridComposition: true
-              )
-            ),
+                android:
+                    AndroidInAppWebViewOptions(useHybridComposition: true)),
             pullToRefreshController: pullToRefreshController,
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
@@ -4425,7 +4423,7 @@ setTimeout(function() {
         ),
       );
       final InAppWebViewController controller =
-      await controllerCompleter.future;
+          await controllerCompleter.future;
       final String? currentUrl = (await controller.getUrl())?.toString();
       expect(currentUrl, 'https://github.com/flutter');
     });
@@ -4746,7 +4744,7 @@ setTimeout(function() {
 
   group('Cookie Manager', () {
     testWidgets('set, get, delete', (WidgetTester tester) async {
-      CookieManager cookieManager = CookieManager.instance();
+      final cookieManager = CookieManager.instance();
       final Completer controllerCompleter = Completer<InAppWebViewController>();
       final Completer<String> pageLoaded = Completer<String>();
       await tester.pumpWidget(
@@ -4797,7 +4795,8 @@ setTimeout(function() {
       final Completer<void> pageLoaded = Completer<void>();
 
       var headlessWebView = new HeadlessInAppWebView(
-        initialUrlRequest: URLRequest(url: Uri.parse("https://github.com/flutter")),
+        initialUrlRequest:
+            URLRequest(url: Uri.parse("https://github.com/flutter")),
         onWebViewCreated: (controller) {
           controllerCompleter.complete(controller);
         },
@@ -4825,7 +4824,8 @@ setTimeout(function() {
       final Completer<void> pageLoaded = Completer<void>();
 
       var headlessWebView = new HeadlessInAppWebView(
-        initialUrlRequest: URLRequest(url: Uri.parse("https://github.com/flutter")),
+        initialUrlRequest:
+            URLRequest(url: Uri.parse("https://github.com/flutter")),
         initialOptions: InAppWebViewGroupOptions(
             crossPlatform: InAppWebViewOptions(javaScriptEnabled: false)),
         onWebViewCreated: (controller) {
@@ -4869,8 +4869,7 @@ setTimeout(function() {
       expect(inAppBrowser.isOpened(), true);
       expect(() async {
         await inAppBrowser.openUrlRequest(
-            urlRequest:
-                URLRequest(url: Uri.parse("https://flutter.dev")));
+            urlRequest: URLRequest(url: Uri.parse("https://flutter.dev")));
       }, throwsA(isInstanceOf<InAppBrowserAlreadyOpenedException>()));
 
       await inAppBrowser.firstPageLoaded.future;
@@ -4892,13 +4891,14 @@ setTimeout(function() {
         await inAppBrowser.show();
       }, throwsA(isInstanceOf<InAppBrowserNotOpenedException>()));
 
-      await inAppBrowser.openFile(assetFilePath: "test_assets/in_app_webview_initial_file_test.html");
+      await inAppBrowser.openFile(
+          assetFilePath: "test_assets/in_app_webview_initial_file_test.html");
       await inAppBrowser.browserCreated.future;
       expect(inAppBrowser.isOpened(), true);
       expect(() async {
         await inAppBrowser.openUrlRequest(
             urlRequest:
-            URLRequest(url: Uri.parse("https://github.com/flutter")));
+                URLRequest(url: Uri.parse("https://github.com/flutter")));
       }, throwsA(isInstanceOf<InAppBrowserAlreadyOpenedException>()));
 
       await inAppBrowser.firstPageLoaded.future;
@@ -4920,7 +4920,8 @@ setTimeout(function() {
         await inAppBrowser.show();
       }, throwsA(isInstanceOf<InAppBrowserNotOpenedException>()));
 
-      await inAppBrowser.openData(data: """
+      await inAppBrowser.openData(
+          data: """
 <!doctype html>
 <html lang="en">
     <head>
@@ -4944,7 +4945,7 @@ setTimeout(function() {
       expect(() async {
         await inAppBrowser.openUrlRequest(
             urlRequest:
-            URLRequest(url: Uri.parse("https://github.com/flutter")));
+                URLRequest(url: Uri.parse("https://github.com/flutter")));
       }, throwsA(isInstanceOf<InAppBrowserAlreadyOpenedException>()));
 
       await inAppBrowser.firstPageLoaded.future;
@@ -4987,12 +4988,12 @@ setTimeout(function() {
       var chromeSafariBrowser = new MyChromeSafariBrowser();
       expect(chromeSafariBrowser.isOpened(), false);
 
-      await chromeSafariBrowser.open(url: Uri.parse("https://github.com/flutter"));
+      await chromeSafariBrowser.open(
+          url: Uri.parse("https://github.com/flutter"));
       await chromeSafariBrowser.browserCreated.future;
       expect(chromeSafariBrowser.isOpened(), true);
       expect(() async {
-        await chromeSafariBrowser.open(
-            url: Uri.parse("https://flutter.dev"));
+        await chromeSafariBrowser.open(url: Uri.parse("https://flutter.dev"));
       }, throwsA(isInstanceOf<ChromeSafariBrowserAlreadyOpenedException>()));
 
       await expectLater(chromeSafariBrowser.firstPageLoaded.future, completes);

@@ -541,35 +541,8 @@ public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                 break
 
             case "setCookie":
-                let url = arguments!["url"] as! String
-                let name = arguments!["name"] as! String
-                let value = arguments!["value"] as! String
-                let domain = arguments!["domain"] as! String
-                let path = arguments!["path"] as! String
-
-                var expiresDate: Int64?
-                if let expiresDateString = arguments!["expiresDate"] as? String {
-                    expiresDate = Int64(expiresDateString)
-                }
-
-                let maxAge = arguments!["maxAge"] as? Int64
-                let isSecure = arguments!["isSecure"] as? Bool
-                let isHttpOnly = arguments!["isHttpOnly"] as? Bool
-                let sameSite = arguments!["sameSite"] as? String
-
-
                 if let webView = webView, #available(iOS 11.0, *) {
-                    webView.setCookie(url: url,
-                                              name: name,
-                                              value: value,
-                                              domain: domain,
-                                              path: path,
-                                              expiresDate: expiresDate,
-                                              maxAge: maxAge,
-                                              isSecure: isSecure,
-                                              isHttpOnly: isHttpOnly,
-                                              sameSite: sameSite,
-                                              result: result)
+                    webView.configuration.websiteDataStore.setCookie(arguments: arguments, result: result)
                 }
                 else {
                     result(nil)
@@ -577,11 +550,8 @@ public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
 
                 break
             case "getCookies":
-                let url = arguments!["url"] as! String
-
                 if let webView = webView, #available(iOS 11.0, *) {
-                    webView.getCookies(url: url, result: result)
-
+                    webView.configuration.websiteDataStore.getCookies(arguments: arguments, result: result)
                 }
                 else {
                     result(nil)
@@ -590,20 +560,15 @@ public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                 break
             case "getAllCookies":
                 if let webView = webView, #available(iOS 11.0, *) {
-                    webView.getAllCookies(result: result)
+                    webView.configuration.websiteDataStore.getAllCookies(result: result)
                 }
                 else {
                     result(nil)
                 }
                 break
             case "deleteCookie":
-                let url = arguments!["url"] as! String
-                let name = arguments!["name"] as! String
-                let domain = arguments!["domain"] as! String
-                let path = arguments!["path"] as! String
-
                 if let webView = webView, #available(iOS 11.0, *) {
-                    webView.deleteCookie(url: url, name: name, domain: domain, path: path, result: result)
+                    webView.configuration.websiteDataStore.deleteCookie(arguments: arguments, result: result)
                 }
                 else {
                     result(nil)
@@ -611,12 +576,8 @@ public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
 
                 break;
             case "deleteCookies":
-                let url = arguments!["url"] as! String
-                let domain = arguments!["domain"] as! String
-                let path = arguments!["path"] as! String
-
                 if let webView = webView, #available(iOS 11.0, *) {
-                    webView.deleteCookies(url: url, domain: domain, path: path, result: result)
+                    webView.configuration.websiteDataStore.deleteCookies(arguments: arguments, result: result)
                 }
                 else {
                     result(nil)
@@ -624,7 +585,7 @@ public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                 break;
             case "deleteAllCookies":
                 if let webView = webView, #available(iOS 11.0, *) {
-                    webView.deleteAllCookies(result: result)
+                    webView.configuration.websiteDataStore.deleteAllCookies(result: result)
                 }
                 else {
                     result(nil)

@@ -19,6 +19,7 @@ class IOSInAppWebViewController {
     cookieHandler = CookieHandler(channel: channel);
   }
 
+  ///Provides access to the [CookieHandler] in this webview instance.
   late CookieHandler cookieHandler;
 
   ///Reloads the current page, performing end-to-end revalidation using cache-validating conditionals if possible.
