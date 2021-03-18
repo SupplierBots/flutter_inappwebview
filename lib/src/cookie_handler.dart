@@ -22,12 +22,12 @@ import 'types.dart';
 ///See https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies for JavaScript restrictions.
 class CookieHandler {
   CookieHandler({
-    required this.channel,
+    required channel,
   }) {
-    this.ios = IOSCookieHandler(channel: channel);
+    this._channel = channel;
+    this.ios = IOSCookieHandler(channel: _channel);
   }
-  final MethodChannel channel;
-
+  late MethodChannel _channel;
   late IOSCookieHandler ios;
 
   ///Sets a cookie for the given [url]. Any existing cookie with the same [host], [path] and [name] will be replaced with the new cookie.
@@ -92,7 +92,7 @@ class CookieHandler {
     args.putIfAbsent('isHttpOnly', () => isHttpOnly);
     args.putIfAbsent('sameSite', () => sameSite?.toValue());
 
-    await channel.invokeMethod('setCookie', args);
+    await _channel.invokeMethod('setCookie', args);
   }
 
   Future<void> _setCookieWithJavaScript(
@@ -171,7 +171,7 @@ class CookieHandler {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url.toString());
     List<dynamic> cookieListMap =
-        await channel.invokeMethod('getCookies', args);
+        await _channel.invokeMethod('getCookies', args);
     cookieListMap = cookieListMap.cast<Map<dynamic, dynamic>>();
 
     cookieListMap.forEach((cookieMap) {
@@ -270,7 +270,7 @@ class CookieHandler {
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url.toString());
-    List<dynamic> cookies = await channel.invokeMethod('getCookies', args);
+    List<dynamic> cookies = await _channel.invokeMethod('getCookies', args);
     cookies = cookies.cast<Map<dynamic, dynamic>>();
     for (var i = 0; i < cookies.length; i++) {
       cookies[i] = cookies[i].cast<String, dynamic>();
@@ -333,7 +333,7 @@ class CookieHandler {
     args.putIfAbsent('name', () => name);
     args.putIfAbsent('domain', () => domain);
     args.putIfAbsent('path', () => path);
-    await channel.invokeMethod('deleteCookie', args);
+    await _channel.invokeMethod('deleteCookie', args);
   }
 
   ///Removes all cookies for the given [url], [domain] and [path].
@@ -380,7 +380,7 @@ class CookieHandler {
     args.putIfAbsent('url', () => url.toString());
     args.putIfAbsent('domain', () => domain);
     args.putIfAbsent('path', () => path);
-    await channel.invokeMethod('deleteCookies', args);
+    await _channel.invokeMethod('deleteCookies', args);
   }
 
   ///Removes all cookies.
@@ -388,7 +388,7 @@ class CookieHandler {
   ///**NOTE for iOS**: available from iOS 11.0+.
   Future<void> deleteAllCookies() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await channel.invokeMethod('deleteAllCookies', args);
+    await _channel.invokeMethod('deleteAllCookies', args);
   }
 
   String _getDomainName(Uri url) {
