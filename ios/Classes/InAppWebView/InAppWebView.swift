@@ -1210,24 +1210,24 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             }
             return
         }
-        if #available(iOS 14.0, *) {
-            let world = WKContentWorld.fromMap(map: ["name" : "supplier"], windowId: windowId);
-            super.evaluateJavaScript(javaScriptString, in: nil, in: world!) { (evalResult) in
-                guard let completionHandler = completionHandler else {
-                    return
-                }
-                switch (evalResult) {
-                case .success(let value):
-                    completionHandler(value, nil)
-                    return
-                case .failure(let error):
-                    completionHandler(nil, error)
-                    break
-                }
-                completionHandler(nil, nil)
-            }
-            return
-        }
+//        if #available(iOS 14.0, *) {
+//            let world = WKContentWorld.fromMap(map: ["name" : "supplier"], windowId: windowId);
+//            super.evaluateJavaScript(javaScriptString, in: nil, in: world!) { (evalResult) in
+//                guard let completionHandler = completionHandler else {
+//                    return
+//                }
+//                switch (evalResult) {
+//                case .success(let value):
+//                    completionHandler(value, nil)
+//                    return
+//                case .failure(let error):
+//                    completionHandler(nil, error)
+//                    break
+//                }
+//                completionHandler(nil, nil)
+//            }
+//            return
+//        }
         super.evaluateJavaScript(javaScriptString, completionHandler: completionHandler)
     }
 
