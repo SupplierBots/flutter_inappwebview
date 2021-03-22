@@ -1226,6 +1226,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 }
                 completionHandler(nil, nil)
             }
+            return
         }
         super.evaluateJavaScript(javaScriptString, completionHandler: completionHandler)
     }
