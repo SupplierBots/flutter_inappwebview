@@ -217,7 +217,7 @@ extension WKWebsiteDataStore {
         })
     }
     
-    public func deleteWebsiteData(result: @escaping FlutterResult) {
+    public func clearInstanceData(result: @escaping FlutterResult) {
         let websiteDataTypes = WKWebsiteDataStore.allWebsiteDataTypes();
         let date = NSDate(timeIntervalSince1970: 0)
         removeData(ofTypes: websiteDataTypes, modifiedSince: date as Date, completionHandler:{

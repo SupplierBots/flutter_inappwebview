@@ -68,7 +68,7 @@ class IOSInAppWebViewController {
   ///Clears all the webview's data.
   Future<void> clearInstanceData() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel.invokeMethod('removeWebsiteData', args);
+    await _channel.invokeMethod('clearInstanceData', args);
   }
 
   ///Returns a Boolean value that indicates whether WebKit natively supports resources with the specified URL scheme.

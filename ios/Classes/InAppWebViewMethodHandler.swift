@@ -591,9 +591,9 @@ public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                     result(nil)
                 }
                 break
-            case "deleteWebsiteData":
+            case "clearInstanceData":
                 if let webView = webView, #available(iOS 11.0, *) {
-                    webView.configuration.websiteDataStore.deleteWebsiteData(result: result)
+                    webView.configuration.websiteDataStore.clearInstanceData(result: result)
                 }
                 else {
                     result(nil)
