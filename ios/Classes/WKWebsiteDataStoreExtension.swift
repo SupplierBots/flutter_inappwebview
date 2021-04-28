@@ -216,4 +216,12 @@ extension WKWebsiteDataStore {
             result(true)
         })
     }
+    
+    public func deleteWebsiteData(result: @escaping FlutterResult) {
+        let websiteDataTypes = WKWebsiteDataStore.allWebsiteDataTypes();
+        let date = NSDate(timeIntervalSince1970: 0)
+        removeData(ofTypes: websiteDataTypes, modifiedSince: date as Date, completionHandler:{
+            result(true)
+        })
+    }
 }

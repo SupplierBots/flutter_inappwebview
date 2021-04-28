@@ -65,6 +65,12 @@ class IOSInAppWebViewController {
     return await _channel.invokeMethod('hasOnlySecureContent', args);
   }
 
+  ///Clears all the webview's data.
+  Future<void> clearInstanceData() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    await _channel.invokeMethod('removeWebsiteData', args);
+  }
+
   ///Returns a Boolean value that indicates whether WebKit natively supports resources with the specified URL scheme.
   ///
   ///[urlScheme] represents the URL scheme associated with the resource.
